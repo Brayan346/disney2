@@ -1,0 +1,41 @@
+<div class="splash-screen">
+  <img src="/icono disney512x512.png" alt="App Icon" class="splash-icon" />
+  <h1 class="splash-title">Bienvenido a Disney </h1>
+</div>
+
+<style>
+  .splash-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1E3A8A, #9333EA);
+    color: white;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .splash-icon {
+    width: 128px;
+    height: 128px;
+    margin-bottom: 20px;
+    animation: fadeIn 1.5s ease-in-out;
+  }
+
+  .splash-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    animation: slideUp 1.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
