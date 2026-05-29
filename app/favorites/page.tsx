@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-interface Character {
+interface Favorite {
   _id: number;
   name: string;
   imageUrl: string;
@@ -10,25 +10,22 @@ interface Character {
   tvShows: string[];
 }
 
-export default function MVPPage() {
-
-  const [characters, setCharacters] =
-    useState<Character[]>([]);
+export default function FavoritesPage() {
 
   const [favorites, setFavorites] =
-    useState<Character[]>([]);
+    useState<Favorite[]>([]);
 
   const [loading, setLoading] =
     useState(true);
 
   const [selectedCharacter, setSelectedCharacter] =
-    useState<Character | null>(null);
+    useState<Favorite | null>(null);
 
   // -----------------------------------
   // CARGAR PERSONAJES
   // -----------------------------------
 
-  const fetchCharacters = async () => {
+  const fetchFavorites = async () => {
 
     try {
 
@@ -40,15 +37,15 @@ export default function MVPPage() {
       const data =
         await response.json();
 
-      const filtered =
+      const cleanData =
         data.data.filter(
-          (character: Character) =>
+          (character: Favorite) =>
             character.imageUrl &&
             character.name
         );
 
-      setCharacters(
-        filtered.slice(0, 16)
+      setFavorites(
+        cleanData.slice(0, 18)
       );
 
     } catch (error) {
@@ -63,31 +60,9 @@ export default function MVPPage() {
 
   useEffect(() => {
 
-    fetchCharacters();
+    fetchFavorites();
 
   }, []);
-
-  // -----------------------------------
-  // AGREGAR FAVORITO
-  // -----------------------------------
-
-  const addFavorite = (
-    character: Character
-  ) => {
-
-    const exists =
-      favorites.find(
-        (fav) =>
-          fav._id === character._id
-      );
-
-    if (exists) return;
-
-    setFavorites([
-      ...favorites,
-      character,
-    ]);
-  };
 
   // -----------------------------------
   // LOADING
@@ -122,36 +97,30 @@ export default function MVPPage() {
         <div>
 
           <h1 className="favorites-title">
-            Disney+ Originals
+            Mis Favoritos
           </h1>
 
           <p className="favorites-description">
-            Explora personajes icónicos
-            del universo Disney
+            Tus personajes favoritos
+            guardados en Disney+
           </p>
 
         </div>
 
       </section>
 
-      {/* FAVORITOS */}
+      {/* GRID */}
 
-      {favorites.length > 0 && (
+      <div className="favorites-grid">
 
-        <section className="saved-section">
+        {favorites.map(
+          (character, index) => {
 
-          <h2 className="saved-title">
-            Guardados
-          </h2>
-
-          <div className="saved-row">
-
-            {favorites.map(
-              (character, index) => (
+            return (
 
               <div
-                key={index}
-                className="saved-card"
+                key={`${character._id}-${index}-${character.name}`}
+                className="favorite-card"
               >
 
                 <img
@@ -159,73 +128,28 @@ export default function MVPPage() {
                   alt={character.name}
                 />
 
-                <p>
-                  {character.name}
-                </p>
+                <div className="favorite-overlay">
+
+                  <h2>
+                    {character.name}
+                  </h2>
+
+                  <button
+                    onClick={() =>
+                      setSelectedCharacter(
+                        character
+                      )
+                    }
+                  >
+                    Ver más
+                  </button>
+
+                </div>
 
               </div>
-
-            ))}
-
-          </div>
-
-        </section>
-
-      )}
-
-      {/* GRID */}
-
-      <div className="favorites-grid">
-
-        {characters.map(
-          (character, index) => (
-
-          <div
-            key={index}
-            className="favorite-card"
-          >
-
-            <img
-              src={character.imageUrl}
-              alt={character.name}
-            />
-
-            <div className="favorite-overlay">
-
-              <h2>
-                {character.name}
-              </h2>
-
-              <div className="card-buttons">
-
-                <button
-                  onClick={() =>
-                    setSelectedCharacter(
-                      character
-                    )
-                  }
-                >
-                  Ver más
-                </button>
-
-                <button
-                  className="like-btn"
-                  onClick={() =>
-                    addFavorite(
-                      character
-                    )
-                  }
-                >
-                  Guardar
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        ))}
+            );
+          }
+        )}
 
       </div>
 

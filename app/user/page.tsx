@@ -6,9 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 interface Usuario {
   id: string;
-  nombre: string;
-  correo: string;
-  telefono: string | null;
+  email: string;
 }
 
 export default function UsuarioPage() {
@@ -18,18 +16,11 @@ export default function UsuarioPage() {
   const [usuario, setUsuario] =
     useState<Usuario | null>(null);
 
-  const [nombre, setNombre] =
-    useState<string>("");
-
-  const [telefono, setTelefono] =
-    useState<string>("");
+  const [loading, setLoading] =
+    useState(true);
 
   const [mensaje, setMensaje] =
-    useState<string | null>(null);
-
-  const [loading, setLoading] =
-    useState<boolean>(true);
-    const [message, setMessage] = useState<string | null>(null);
+    useState("");
 
   // -------------------------------------
   // CARGAR USUARIO
@@ -43,96 +34,29 @@ export default function UsuarioPage() {
 
     if (!user) {
 
-      setMensaje(
-        "No hay usuario logueado"
-      );
-
-      setLoading(false);
+      router.push("/login");
 
       return;
     }
 
-    const { data, error } =
-      await supabase
-        .from("usuarios")
-        .select(
-          "id, nombre, correo, telefono"
-        )
-        .eq("id", user.id)
-        .single();
-
-    if (error) {
-
-      console.error(
-        "Error al cargar usuario:",
-        error.message
-      );
-
-      setMensaje(
-        "No se encontró el usuario"
-      );
-
-    } else if (data) {
-
-      setUsuario(data);
-
-      setNombre(data.nombre);
-
-      setTelefono(
-        data.telefono || ""
-      );
-    }
+    setUsuario({
+      id: user.id,
+      email: user.email || "",
+    });
 
     setLoading(false);
   };
 
   // -------------------------------------
-  // ACTUALIZAR PERFIL
+  // CERRAR SESION
   // -------------------------------------
 
-  const handleUpdate = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleLogout = async () => {
 
-    e.preventDefault();
+    await supabase.auth.signOut();
 
-    if (!usuario) return;
-
-    const { error } =
-      await supabase
-        .from("usuarios")
-        .update({
-          nombre,
-          telefono,
-        })
-        .eq("id", usuario.id);
-
-    if (error) {
-
-      setMensaje(
-        "Error al actualizar perfil"
-      );
-
-    } else {
-
-      setMensaje(
-        "Perfil actualizado"
-      );
-
-      fetchUsuario();
-    }
+    router.push("/login");
   };
-
-// -------------------------------------
-// CERRAR SESION
-// -------------------------------------
-
-const handleLogout = async () => {
-
-  await supabase.auth.signOut();
-
-  router.push("/login");
-};
 
   // -------------------------------------
   // INICIO
@@ -144,127 +68,102 @@ const handleLogout = async () => {
 
   }, []);
 
-  if (loading)
+  // -------------------------------------
+  // LOADING
+  // -------------------------------------
+
+  if (loading) {
+
     return (
-      <p className="text-center text-white mt-10">
-        Cargando...
-      </p>
-    );
 
-    //validacion
+      <div className="loading-screen">
 
-    useEffect(() => {
-      const checkUser = async () => {
-        const { data } = await supabase.auth.getUser();
-        if (!data.user) {
-          // ❌ No hay usuario logueado → redirige a login
-          router.push("/login");
-        } else {
-          // ✅ Usuario logueado, seguimos con la página
-          setLoading(false);
-        }
-      };
-      checkUser();
-    }, [router]);
-
-  // -------------------------------------
-  // INTERFAZ
-  // -------------------------------------
-
-  return (
-
-    <div className="min-h-screen bg-[#0b0f1a] flex items-center justify-center p-6">
-
-      <div className="w-full max-w-md bg-[#121826] rounded-2xl p-8 shadow-2xl">
-
-        <h1 className="text-white text-4xl font-bold text-center mb-8">
-          Mi Perfil
+        <h1>
+          Disney+
         </h1>
 
-        {usuario ? (
+      </div>
+    );
+  }
 
-          <form
-            onSubmit={handleUpdate}
-            className="flex flex-col gap-4"
-          >
+  // -------------------------------------
+  // UI
+  // -------------------------------------
 
-            {/* NOMBRE */}
+ return (
 
-            <input
-              type="text"
-              value={nombre}
-              onChange={(e) =>
-                setNombre(
-                  e.target.value
-                )
-              }
-              placeholder="Nombre"
-              required
-              className="bg-[#1b2436] text-white p-3 rounded-lg outline-none"
-            />
+  <div className="user-page">
 
-            {/* TELEFONO */}
+    <nav className="user-navbar">
 
-            <input
-              type="text"
-              value={telefono}
-              onChange={(e) =>
-                setTelefono(
-                  e.target.value
-                )
-              }
-              placeholder="Teléfono"
-              className="bg-[#1b2436] text-white p-3 rounded-lg outline-none"
-            />
+      <h1 className="user-logo">
+        Disney+
+      </h1>
 
-            {/* CORREO */}
+      <button
+        onClick={() => router.push("/home")}
+        className="user-nav-button"
+      >
+        Inicio
+      </button>
 
-            <input
-              type="email"
-              value={usuario.correo}
-              readOnly
-              className="bg-[#0f1725] text-gray-400 p-3 rounded-lg"
-            />
+    </nav>
 
-            {/* BOTON */}
+    <div className="user-container">
 
-            <button
-              type="submit"
-              className="bg-[#1f80ff] text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
-            >
-              Guardar cambios
-            </button>
+      <div className="user-avatar">
 
-          </form>
-
-        ) : (
-
-          <p className="text-center text-gray-400">
-            {mensaje}
-          </p>
-
-        )}
-
-        {/* 📴 Botón para cerrar sesión, esto va en el return */}
-        <button
-        onClick={handleLogout}
-        className="bg-gray-400 text-white p-2 rounded mt-4 w-full"
-        >
-          Cerrar sesión
-          </button>
-
-        {/* MENSAJE */}
-
-        {mensaje && (
-
-          <p className="text-center text-gray-300 mt-5">
-            {mensaje}
-          </p>
-
-        )}
+        {usuario?.email
+          ?.charAt(0)
+          .toUpperCase()}
 
       </div>
 
+      <h1 className="user-title">
+        Mi Perfil
+      </h1>
+
+      <p className="user-email">
+        {usuario?.email}
+      </p>
+
+      <div className="user-card">
+
+        <span>
+          Cuenta
+        </span>
+
+        <h2>
+          Disney User
+        </h2>
+
+      </div>
+
+      <div className="user-card">
+
+        <span>
+          Suscripción
+        </span>
+
+        <h2>
+          Disney+ Premium
+        </h2>
+
+      </div>
+
+      <button className="user-primary-button">
+        Editar perfil
+      </button>
+
+      <button
+        onClick={handleLogout}
+        className="user-secondary-button"
+      >
+        Cerrar sesión
+      </button>
+
     </div>
-  );
+
+  </div>
+);
 }

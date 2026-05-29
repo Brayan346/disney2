@@ -5,9 +5,12 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] =
+    useState("");
+
   const [password, setPassword] =
     useState("");
 
@@ -17,77 +20,113 @@ export default function RegisterPage() {
   const handleRegister = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
+
     e.preventDefault();
 
     const { error } =
       await supabase.auth.signUp({
+
         email,
         password,
+
       });
 
     if (error) {
-      setMessage(error.message);
+
+      setMessage(
+        "Error al crear cuenta"
+      );
+
       return;
     }
 
-    setMessage("Cuenta creada");
+    setMessage(
+      "Cuenta creada correctamente"
+    );
 
     setTimeout(() => {
+
       router.push("/login");
-    }, 1000);
+
+    }, 1500);
   };
 
-  const [loading, setLoading] = useState(true);
-
   return (
-    <div className="min-h-screen bg-[#0b0f1a] flex items-center justify-center">
-      <div className="w-[400px] bg-[#121826] p-8 rounded-2xl">
-        <h1 className="text-white text-4xl font-bold text-center mb-8">
-          Registro
+
+    <div className="auth-page">
+
+      <div className="auth-overlay">
+
+        <h1 className="auth-logo">
+          Disney+
         </h1>
 
-        <form
-          onSubmit={handleRegister}
-          className="flex flex-col gap-4"
-        >
-          <input
-            type="email"
-            placeholder="Correo"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
-            className="bg-[#1b2436] text-white p-3 rounded-lg outline-none"
-          />
+        <div className="auth-card">
 
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
-            className="bg-[#1b2436] text-white p-3 rounded-lg outline-none"
-          />
+          <h2>
+            Crear Cuenta
+          </h2>
 
-          <button className="bg-[#1f80ff] text-white p-3 rounded-lg font-semibold">
-            Registrarse
+          <p className="auth-subtitle">
+            Únete a Disney+
+          </p>
+
+          <form
+            onSubmit={handleRegister}
+            className="auth-form"
+          >
+
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) =>
+                setEmail(
+                  e.target.value
+                )
+              }
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) =>
+                setPassword(
+                  e.target.value
+                )
+              }
+              required
+            />
+
+            <button type="submit">
+              Registrarse
+            </button>
+
+          </form>
+
+          <button
+            className="auth-secondary-btn"
+            onClick={() =>
+              router.push("/login")
+            }
+          >
+            Ya tengo cuenta
           </button>
-        </form>
 
-        <button
-          onClick={() =>
-            router.push("/login")
-          }
-          className="text-[#1f80ff] mt-5 w-full"
-        >
-          Ya tengo cuenta
-        </button>
+          {message && (
 
-        <p className="text-green-400 text-center mt-4">
-          {message}
-        </p>
+            <p className="auth-message">
+              {message}
+            </p>
+
+          )}
+
+        </div>
+
       </div>
+
     </div>
   );
 }
