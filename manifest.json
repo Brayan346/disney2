@@ -1,0 +1,20 @@
+{
+  "name": "Disney App",
+  "short_name": "Disney",
+  "icons": [
+    {
+      "src": "/icono disney192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icono disney512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1E3A8A"
+}
